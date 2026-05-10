@@ -43,7 +43,4 @@ private:
     // pasa de pixeles a cuadriculas
     sf::Vector2i pixelToCell(sf::Vector2i pixelPos) const;
 
-    // manejo de eventos individuales
-    PlayerAction handleMousePressed(sf::Event& event);
-    PlayerAction handleKeyPressed(sf::Event& event);
 };
