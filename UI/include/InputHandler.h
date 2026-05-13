@@ -4,10 +4,9 @@
 
 enum class ActionType {
     None,
-    TankSelected,
-    MoveTarget,
-    ShootTarget,
-    ConsumePowerUp,
+    LeftClick,        
+    RightClick,       
+    ShiftPressed,     
     CloseWindow
 };
 
@@ -34,15 +33,14 @@ public:
     // verifica si el mouse esta dentro del area del mapa
     bool isMouseOnMap() const;
 
+    sf::Event getLastEvent() const;
+
 private:
     sf::RenderWindow& window;
     sf::Vector2i hoveredCell;
     sf::Vector2i lastClickedCell;
-
+    sf::Event lastEvent;
     // pasa de pixeles a cuadriculas
     sf::Vector2i pixelToCell(sf::Vector2i pixelPos) const;
 
-    // manejo de eventos individuales
-    PlayerAction handleMousePressed(sf::Event& event);
-    PlayerAction handleKeyPressed(sf::Event& event);
 };

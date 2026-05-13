@@ -33,7 +33,7 @@ public:
     // Pantallas
     void drawMainMenu(const std::vector<class Button*>& buttons);
     void drawInstructions(const std::vector<class Button*>& buttons);
-    void drawGameOver(int winnerID, int player1Tanks, int player2Tanks);
+    void drawGameOver(int winnerID, int player1Tanks, int player2Tanks, const std::vector<Button*>& buttons);
     void drawBackground();
 
     // Texturas

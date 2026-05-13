@@ -32,11 +32,11 @@ private:
     void drawCurrentPlayer();
 
     // vida de tanques
-    // [jugador][tanque] → 2 tanques por jugador
-    float tankHealth[2][2];
-    sf::RectangleShape healthBarBackground[2][2];
-    sf::RectangleShape healthBar[2][2];
-    sf::Text tankLabel[2][2];
+    // [jugador][tanque] → 4 tanques por jugador
+    float tankHealth[2][4];
+    sf::RectangleShape healthBarBackground[2][4];
+    sf::RectangleShape healthBar[2][4];
+    sf::Text tankLabel[2][4];
     void drawTankHealth();
 
     // power-ups en cola
