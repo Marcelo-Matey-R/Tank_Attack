@@ -1,0 +1,12 @@
+#ifndef POWERUP_H
+#define POWERUP_H
+
+enum class PowerUp{
+    NULL_POWERUP,
+    DOUBLETURN,
+    MOVEMENTPRECISION,
+    ATTACKACCURACY,
+    ATTACKPOWER
+};
+
+#endif
