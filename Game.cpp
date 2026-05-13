@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "UI/include/Constants.h"
+#include "Constants.h"
 #include "UI/include/Button.h"
 #include "UI/include/Renderer.h"
 #include "UI/include/InputHandler.h"
