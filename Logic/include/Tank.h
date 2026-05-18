@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include <vector>
+#include <random>
 #include "Element.h"
 #include "StructPosition.h"
 #include "EnumColorTank.h"
@@ -11,8 +12,11 @@
 #define TANK_H
 class Bullet;
 class Tank : public Element{
-    private:
-    int life;
+    protected:
+    std::random_device rng{};
+	std::mt19937 gen{rng()};
+	std::uniform_int_distribution<int> dis{1, 10};
+    float life;
     ColorTank color; // Valor que se utiliza el mapa
     Position position;
     virtual TypePath SelectPathfinding(PowerUp movePrecise = PowerUp::NULL_POWERUP) = 0; // Da un numero para saber cual pathfinding se eligio (depende del tipo de tanque)
@@ -33,7 +37,7 @@ class Tank : public Element{
     virtual void DecreaseHealth(PowerUp attackPlus = PowerUp::NULL_POWERUP) = 0; // Cada tipo de tanque tiene en recibir danio
     virtual Bullet* Attack(PowerUp attackPlus = PowerUp::NULL_POWERUP, PowerUp attackAccuracy = PowerUp::NULL_POWERUP, const Position &destiny) = 0; // Cada tanque ataca a su manera    
     bool IsAlive(){return life > 0;} // Dice si el tanque esta vivo o no
-    int GetLife(){return life;}
+    float GetLife(){return life;}
     ColorTank GetColor(){return color;} // Devuelve el color del tanque
     Position GetPosition(){return position;} // Devuelve la posicion
     std::vector<Position> GetPath(PowerUp movePrecise = PowerUp::NULL_POWERUP, Position destination); // Devuelve el Path para ir al destino
