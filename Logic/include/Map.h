@@ -40,7 +40,6 @@ class Map{
 	// Elimina obstaculos del mapa en base a una lista de posiciones
 	void EliminateObstacles(const std::vector<Position> &pos);
 
-
 	// Si no hay conectividad entonces forzamos que haya
 	void CreateConectivity(); 
 
