@@ -60,7 +60,7 @@ void Map::SetTankOfPlayer1(){
     Tank* tankRed = new TankYellowAndRed(ColorTank::RED);
     tanksPlayer0[1] = tankRed;
 
-    while(IsNullPlace(pos)){
+    while(!IsNullPlace(pos)){
         pos.i = disRows(gen);
         pos.j = disCols(gen);
     }
@@ -83,7 +83,7 @@ void Map::SetTankOfPlayer2(){
     Tank* tankYellow = new TankYellowAndRed(ColorTank::YELLOW);
     tanksPlayer1[1] = tankYellow;
 
-    while(IsNullPlace(pos)){
+    while(!IsNullPlace(pos)){
         pos.i = disRows(gen);
         pos.j = disCols(gen);
     }
