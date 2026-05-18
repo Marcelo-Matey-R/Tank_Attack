@@ -17,9 +17,10 @@ class Pathfinding{
     static bool IsInvalidPosition(const Position &neighborPos);
     static void FloodFill(Element* (&map)[GRID_ROWS][GRID_COLS], int (&zones)[GRID_ROWS][GRID_COLS], const Position &start, int actualColor);
     static std::vector<Position> A_Star_Game(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
-    static void RandomMoves(Element* (&map)[GRID_ROWS][GRID_COLS], std::vector<Position> &pos, Position &start);
+    static void RandomMoves(Element* (&map)[GRID_ROWS][GRID_COLS], std::vector<Position> &pos, const Position &start);
     static std::vector<Position> A_Star_Map(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
     static std::vector<Position> LOS(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
+    static std::vector<Position> AleatoryMovement(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
     public:
     static bool IsConected(Element* (&map)[GRID_ROWS][GRID_COLS], const Position destinies[4]);
     static std::vector<Position> SelectAlgorithm(TypePath path, Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
