@@ -295,8 +295,8 @@ bool Pathfinding::IsInvalidPosition(const Position &neighborPos){
     return neighborPos.i < 0 || neighborPos.i >= GRID_ROWS || neighborPos.j < 0 || neighborPos.j >= GRID_COLS;
 }
 
-void Pathfinding::RandomMoves(Element* (&map)[GRID_ROWS][GRID_COLS], std::vector<Position> &pos, Position &start){
-    Position tmp;
+void Pathfinding::RandomMoves(Element* (&map)[GRID_ROWS][GRID_COLS], std::vector<Position> &pos, const Position &start){
+    Position tmp = start;
     int moves = 0;
     std::random_device rng{};
 	std::mt19937 gen{rng()};
@@ -307,21 +307,20 @@ void Pathfinding::RandomMoves(Element* (&map)[GRID_ROWS][GRID_COLS], std::vector
         switch (selection)
         {
             case 0:
-                tmp = start + up;
+                tmp += up;
 
             case 1:
-                tmp = start + down;
+                tmp += down;
 
             case 2:
-                tmp = start + right;
+                tmp += right;
 
             case 3:
-                tmp = start + left;
+                tmp += left;
         }
 
         if(IsInvalidPosition(tmp) || map[tmp.i][tmp.j]->GetType() != TypeElement::Floor) continue;
         pos.push_back(tmp);
-        start = tmp;
         moves++;
     }
 }
@@ -351,5 +350,17 @@ std::vector<Position> Pathfinding::LOS(Element* (&map)[GRID_ROWS][GRID_COLS], co
     }
 
     return positions;
-    
+}
+
+std::vector<Position> Pathfinding::AleatoryMovement(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
+    int temps = 0;
+
+    while(temps <= 1){
+        std::vector<Position> path = LOS(map, start, destiny);
+        if(path.empty()){
+            RandomMoves(map, path, start);
+            temps++;
+        }
+        else return path;
+    }
 }
