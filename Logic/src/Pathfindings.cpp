@@ -319,7 +319,10 @@ void Pathfinding::RandomMoves(Element* (&map)[GRID_ROWS][GRID_COLS], std::vector
                 tmp += left;
         }
 
-        if(IsInvalidPosition(tmp) || map[tmp.i][tmp.j]->GetType() != TypeElement::Floor) continue;
+        if(IsInvalidPosition(tmp) || map[tmp.i][tmp.j]->GetType() != TypeElement::Floor){
+		    moves++;
+            continue;
+	    }
         pos.push_back(tmp);
         moves++;
     }
