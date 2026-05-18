@@ -6,6 +6,7 @@ enum class TypePath{
     ASTAR_GAME,
     ASTAR_MAP,
     DIJKSTRA,
+    ALEATORYMOVEMENT,
     LOS
 };
 
