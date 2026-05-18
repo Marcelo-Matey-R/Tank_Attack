@@ -26,6 +26,7 @@ void TankLightBlueAndBlue::DecreaseHealth(PowerUp attackPlus){
 
     if(attackPlus == PowerUp::NULL_POWERUP){
         life -= life/4;
+        if(life < 1.0) life = 0;
     }
     else life = 0;
 }
@@ -63,6 +64,7 @@ void TankYellowAndRed::DecreaseHealth(PowerUp attackPlus){
 
     if(attackPlus == PowerUp::NULL_POWERUP){
         life -= life/2;
+        if(life < 1.0) life = 0;
     }
     else life = 0;
 }
@@ -70,3 +72,5 @@ void TankYellowAndRed::DecreaseHealth(PowerUp attackPlus){
 Bullet* TankYellowAndRed::Attack(PowerUp attackPlus = PowerUp::NULL_POWERUP, PowerUp attackAccuracy = PowerUp::NULL_POWERUP, const Position &destiny){
 
 }
+
+#pragma endregion
