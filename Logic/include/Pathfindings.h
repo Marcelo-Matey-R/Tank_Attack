@@ -3,7 +3,7 @@
 #include "StructPosition.h"
 #include "Element.h"
 #include "EnumTypePath.h"
-#include "include/Constants.h"
+#include "../../UI/include/Constants.h"
 
 #ifndef PATHFINDING_H
 #define PATHFINDING_H
@@ -22,7 +22,7 @@ class Pathfinding{
     static std::vector<Position> LOS(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
     static std::vector<Position> AleatoryMovement(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
     public:
-    static bool IsConected(Element* (&map)[GRID_ROWS][GRID_COLS], const Position destinies[4]);
+    static bool IsConected(Element* (&map)[GRID_ROWS][GRID_COLS], const Position destinies[8]);
     static std::vector<Position> SelectAlgorithm(TypePath path, Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
 };
 

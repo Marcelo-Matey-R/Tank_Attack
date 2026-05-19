@@ -6,7 +6,7 @@ struct Node
     Position pos;
     int weight;
 
-    bool operator<(const Node &n){
+    bool operator<(const Node &n) const{
         return weight > n.weight;
     }
     bool operator>(const Node &n){

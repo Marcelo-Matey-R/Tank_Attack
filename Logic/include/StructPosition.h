@@ -1,3 +1,4 @@
+#include <cstdlib>
 #ifndef STRUCTPOSITION_H
 #define STRUCTPOSITION_H
 

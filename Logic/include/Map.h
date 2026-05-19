@@ -1,4 +1,4 @@
-#include "include/Constants.h"
+#include "../../UI/include/Constants.h"
 #include "Element.h"
 #include "StructPosition.h"
 #include "EnumColorTank.h"
@@ -20,8 +20,8 @@ class Map{
 	std::random_device rng{};
 	std::mt19937 gen{rng()};
 	std::uniform_int_distribution<int> binary{0, 1};
-	std::uniform_int_distribution<int> disRows{0, GRID_ROWS};
-	std::uniform_int_distribution<int> disCols{0, GRID_COLS};
+	std::uniform_int_distribution<int> disRows{0, GRID_ROWS-1};
+	std::uniform_int_distribution<int> disCols{0, GRID_COLS-1};
 
 	Map();
 
@@ -35,7 +35,7 @@ class Map{
 	void SetTankOfPlayer2(); 
 
 	// Recorre el mapa para verificar que cada Tank pueda llegar a los demas
-	bool VerifyConectivity(const Position destinies[4]); 
+	bool VerifyConectivity(const Position destinies[8]); 
 
 	// Elimina obstaculos del mapa en base a una lista de posiciones
 	void EliminateObstacles(const std::vector<Position> &pos);
@@ -90,6 +90,8 @@ class Map{
 
 	// Devuelve el tanque en (row, col)
 	Tank* GetTankIn(const Position &pos); 
+
+	void GetMap(Element* (&outMap)[GRID_ROWS][GRID_COLS]);
 
 	// Busca al tanque de ese color
 	Tank* GetTankOfPlayer(int idPlayer, ColorTank color);
