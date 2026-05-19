@@ -4,6 +4,7 @@ add_library(UI_lib STATIC ${UI_SOURCES})
 
 target_include_directories(UI_lib PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Logic/include
 )
 
 target_link_libraries(UI_lib PUBLIC

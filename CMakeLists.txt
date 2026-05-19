@@ -7,17 +7,17 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(SFML 2.6 COMPONENTS graphics window system REQUIRED)
 
-#add_subdirectory(Logic)
+add_subdirectory(Logic)
 add_subdirectory(UI)
 
 add_executable(TankAttack main.cpp Game.cpp)
 
-target_include_directories(TankAttack PRIVATE include)
+target_include_directories(TankAttack PRIVATE include UI/include Logic/include)
 
 target_link_libraries(TankAttack
     PRIVATE
     UI_lib
-    #Logic_lib
+    Logic_lib
     sfml-graphics
     sfml-window
     sfml-system
