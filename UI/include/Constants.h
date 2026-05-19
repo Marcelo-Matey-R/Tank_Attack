@@ -51,6 +51,15 @@ const int COLOR_TANK_CYAN[3]   = {0,   255, 255};
 const int COLOR_TANK_RED[3]    = {255, 0,   0};
 const int COLOR_TANK_YELLOW[3] = {255, 255, 0};
 
+//Bala
+const int BULLET_MIN_BOUNCES = 1;
+const int BULLET_MAX_BOUNCES = 5;
+const float BULLET_SPEED     = 5.0f;  
+const int BULLET_SIZE        = 8;   
+
 //Ruta trazada del pathfinding
 const int PATH_COLOR_ALPHA  = 150;  // transparencia
 const int PATH_CELL_PADDING = 8;    // para que el dibujado no cubra absolutamente toda la celda
+
+//Tiempo de juego
+const int MAX_TIME_SECONDS = 300;  // 5 minutos
