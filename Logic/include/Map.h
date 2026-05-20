@@ -104,9 +104,6 @@ class Map{
 	Tank* GetTankIn(const Position &pos); 
 
 	void GetMap(Element* (&outMap)[GRID_ROWS][GRID_COLS]);
-
-	// Busca al tanque de ese color
-	Tank* GetTankOfPlayer(int idPlayer, ColorTank color);
 	
 	// Devuelve la lista con los tanques pertenecientes al jugador
 	Tank** GetTanksOfPlayer(int idPlayer);

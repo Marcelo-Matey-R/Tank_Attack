@@ -7,10 +7,16 @@
 #pragma region Constructos and Destructor
 
 Map::Map(){
+    tanksPlayer0 = nullptr;
+    tanksPlayer1 = nullptr;
     InitMap();
 }
 
 void Map::InitMap(){
+    if (tanksPlayer0 != nullptr || tanksPlayer1 != nullptr){
+        std::cout << "Warning: InitMap llamado sin ResetMap previo" << std::endl;
+        ResetMap();
+    }
     std::cout << "Creando arrays de tanques..." << std::endl;
     tanksPlayer0 = new Tank *[4];
     tanksPlayer1 = new Tank *[4];
@@ -47,7 +53,7 @@ void Map::ResetMap(){
     }
     if (tanksPlayer1 != nullptr){
         for(int i = 0; i < 4; i++){
-            if(tanksPlayer0[i] == nullptr) continue;
+            if(tanksPlayer1[i] == nullptr) continue;
             delete tanksPlayer1[i];
             tanksPlayer1[i] = nullptr;
         }
@@ -56,9 +62,10 @@ void Map::ResetMap(){
     }
     for (int i = 0; i < GRID_ROWS; i++){
         for (int j = 0; j < GRID_COLS; j++){
-            if (map[i][j] != nullptr)
+            if (map[i][j] != nullptr){
                 delete map[i][j];
                 map[i][j] = nullptr;
+            }
         }
     }
 }
@@ -101,7 +108,7 @@ void Map::SpawnTank(Tank* tank, int idx, int idPlayer){
     tank->SetPosition(pos);
     map[pos.i][pos.j] = tank;
 
-    if(idx == 0){
+    if(idPlayer == 0){
         tanksPlayer0[idx] = tank;
     }
     else tanksPlayer1[idx] = tank;
@@ -304,26 +311,6 @@ Tank *Map::GetTankIn(const Position &pos){
         return nullptr;
     }
     return static_cast<Tank *>(map[pos.i][pos.j]);
-}
-
-Tank *Map::GetTankOfPlayer(int idPlayer, ColorTank color){
-    if (!IsRealPlayer(idPlayer)){
-        throw std::invalid_argument("El id del jugador no existe");
-    }
-    switch (idPlayer){
-        case 0:
-            if (color == ColorTank::BLUE)
-                return tanksPlayer0[1];
-            return tanksPlayer0[0];
-
-        case 1:
-            if (color == ColorTank::LIGTHBLUE)
-                return tanksPlayer1[1];
-            return tanksPlayer1[0];
-
-        default:
-            return nullptr;
-    }
 }
 
 Tank **Map::GetTanksOfPlayer(int idPlayer){
