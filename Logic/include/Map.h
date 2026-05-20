@@ -28,6 +28,9 @@ class Map{
 	// Rellena el mapa
 	void  FillMap(); 
 
+	//Facilitador del seteo de tanques
+	void SpawnTank(Tank* tank, int idx, int idPlayer);
+
 	// Se crean los tanques del jugador 1 y se ponen en una posicion aleatoria del mapa no ocupada
 	void SetTankOfPlayer1(); 
 
@@ -35,7 +38,13 @@ class Map{
 	void SetTankOfPlayer2(); 
 
 	// Recorre el mapa para verificar que cada Tank pueda llegar a los demas
-	bool VerifyConectivity(const Position destinies[8]); 
+	bool VerifyConectivity(const Position destinies[8]);
+
+	// Hace un reset del mapa al eliminar los punteros
+	void ResetMap();
+
+	// Hace la inicializacion de los atributos
+	void InitMap();
 
 	// Elimina obstaculos del mapa en base a una lista de posiciones
 	void EliminateObstacles(const std::vector<Position> &pos);
@@ -76,6 +85,9 @@ class Map{
 	void operator=(const Map&) = delete;
 
 	~Map();
+
+	// Hace un reinicio del mapa (no crea ni elimina la instancia)
+	void RestartGame();
 
 	// Elimina el obstaculo por un suelo sin tumba
 	void EliminateObstacle(const Position &pos);
