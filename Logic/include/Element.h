@@ -12,12 +12,15 @@ class Element{
         case TypeElement::Floor:
             weightMap = 1;
             weightGame = 1;
+            break;
         case TypeElement::Obstacle:
             weightGame = INF;
             weightMap = 100;
+            break;
         case TypeElement::Tank:
             weightGame = INF;
             weightMap = INF;
+            break;
         }
     }
     public:
