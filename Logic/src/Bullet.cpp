@@ -21,8 +21,7 @@ Bullet::Bullet(Position origin, Position destination,
     bounces = 0;
 
     // número aleatorio de rebotes
-    std::uniform_int_distribution<int> disBounces(BULLET_MIN_BOUNCES,
-                                                   BULLET_MAX_BOUNCES);
+    std::uniform_int_distribution<int> disBounces(BULLET_MIN_BOUNCES, BULLET_MAX_BOUNCES);
     maxBounces = disBounces(gen);
 
     // inicializar dirección
@@ -201,8 +200,13 @@ bool Bullet::IsWall(Map* map, Position cell) const {
 }
 
 bool Bullet::IsTank(Map* map, Position cell) const {
-    if (IsOutOfBounds(cell)) return false;
+   if (IsOutOfBounds(cell)) return false;
+    
     Element* elem = map->GetElementAt(cell);
-    return elem != nullptr && 
-           elem->GetType() == TypeElement::Tank;
+    if (elem == nullptr || elem->GetType() != TypeElement::Tank) return false;
+
+    // Ignorar al tank de origen solo si no ha rebotado
+    if (cell == origin && bounces == 0) return false;
+
+    return true;
 }
