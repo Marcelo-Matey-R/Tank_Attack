@@ -28,6 +28,7 @@ public:
     bool HasReachedDestination() const;
     int GetMaxBounces() const;
     void Deactivate();
+    bool IsTank(Map* map, Position cell) const;
 private:
     std::random_device rng;
     std::mt19937 gen;
@@ -59,7 +60,6 @@ private:
     // helpers de colisión
     bool IsWall(Map* map, Position cell) const;
     bool IsOutOfBounds(Position cell) const;
-    bool IsTank(Map* map, Position cell) const;
 
     // calcula rebote según tipo de pared tocada
     void ApplyRebound(Map* map, Position cell);

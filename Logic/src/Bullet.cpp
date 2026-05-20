@@ -94,7 +94,7 @@ void Bullet::CalculatePath(Map* map) {
             simX -= simDx;
             simY -= simDy;
 
-        } else if (elem->GetType() == TypeElement::Tank) {
+        } else if (IsTank(map, cell)) {
             // llegó a un tanque — terminar trayectoria
             break;
         }

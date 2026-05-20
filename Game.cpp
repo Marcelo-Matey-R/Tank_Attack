@@ -413,7 +413,7 @@ void Game::updateBullet()
         return;
     }
 
-    if (elem->GetType() == TypeElement::Tank)
+    if (currentBullet->IsTank(map, cell))
     {
         Tank *tank = map->GetTankIn(cell);
         std::cout << "Bala toco tanque en: " << cell.i << "," << cell.j << std::endl;

@@ -33,8 +33,7 @@ TypePath TankLightBlueAndBlue::SelectPathfinding(PowerUp movePrecise) {
 
 void TankLightBlueAndBlue::DecreaseHealth(PowerUp attackPlus) {
     // ignorar power-ups inválidos en vez de lanzar excepción
-    if (attackPlus != PowerUp::ATTACKPOWER && 
-        attackPlus != PowerUp::NULL_POWERUP) {
+    if (attackPlus != PowerUp::ATTACKPOWER && attackPlus != PowerUp::NULL_POWERUP) {
         attackPlus = PowerUp::NULL_POWERUP;
     }
 
@@ -45,10 +44,7 @@ void TankLightBlueAndBlue::DecreaseHealth(PowerUp attackPlus) {
     else life = 0;
 }
 
-Bullet *TankLightBlueAndBlue::Attack(const Position &destiny,
-                                     PowerUp attackPlus,
-                                     PowerUp attackAccuracy)
-{
+Bullet *TankLightBlueAndBlue::Attack(const Position &destiny, PowerUp attackPlus, PowerUp attackAccuracy){
     // daño base 25% para azul/celeste
     float damage = 25.0f;
 
@@ -65,8 +61,7 @@ Bullet *TankLightBlueAndBlue::Attack(const Position &destiny,
 
 
 TypePath TankYellowAndRed::SelectPathfinding(PowerUp movePrecise) {
-    if (movePrecise != PowerUp::MOVEMENTPRECISION && 
-        movePrecise != PowerUp::NULL_POWERUP) {
+    if (movePrecise != PowerUp::MOVEMENTPRECISION && movePrecise != PowerUp::NULL_POWERUP) {
         movePrecise = PowerUp::NULL_POWERUP;  // ← ignorar en vez de lanzar excepción
     }
 
@@ -94,10 +89,7 @@ void TankYellowAndRed::DecreaseHealth(PowerUp attackPlus) {
     }
     else life = 0;
 }
-Bullet *TankYellowAndRed::Attack(const Position &destiny,
-                                 PowerUp attackPlus,
-                                 PowerUp attackAccuracy)
-{
+Bullet *TankYellowAndRed::Attack(const Position &destiny, PowerUp attackPlus, PowerUp attackAccuracy){
     // daño base 50% para rojo/amarillo
     float damage = 50.0f;
 
