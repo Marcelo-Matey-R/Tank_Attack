@@ -42,6 +42,15 @@ private:
     GameState currentState;
     Bullet *currentBullet = nullptr; // bala activa actualmente
     std::vector<Position> currentTankPath;
+    int bulletFrameCounter = 0;
+    const int BULLET_FRAMES_PER_STEP = 10; // frames entre cada celda
+
+    // animación de movimiento del tanque
+    std::vector<Position> tankAnimPath;
+    int tankAnimStep;
+    int tankAnimFrameCounter;
+    const int TANK_FRAMES_PER_STEP = 5;
+    bool isTankMoving;
 
     // Sistemas UI
     Renderer *renderer;
@@ -89,6 +98,7 @@ private:
     // Logica de playing
     void updateBullet();
     void updateTimer();
+    void updateTankAnimation();
     void checkWinCondition();
     void endTurn();
     void handleTankSelection(Position cell);

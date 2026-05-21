@@ -32,6 +32,10 @@ Game::Game()
     turnState = TurnState::SelectingTank;
     timeRemaining = MAX_TIME_SECONDS;
     winner = -1;
+    tankAnimStep = 0;
+    tankAnimFrameCounter = 0;
+    isTankMoving = false;
+    tankAnimPath.clear();
     initMainMenu();
 }
 
@@ -97,6 +101,7 @@ void Game::update()
     case GameState::Playing:
         updateTimer();
         updateBullet();
+        updateTankAnimation();
         break;
     case GameState::GameOver:
         for (auto &button : gameOverButtons)
@@ -152,10 +157,10 @@ void Game::initInstructions()
 
 void Game::initPlaying()
 {
-    std::cout << "Iniciando mapa..." << std::endl;
     map = Map::GetInstance();
 
-    std::cout << "Mapa obtenido, inicializando jugadores..." << std::endl;
+    map->RestartGame();
+
     if (players[0])
         delete players[0];
     if (players[1])
@@ -163,12 +168,16 @@ void Game::initPlaying()
     players[0] = new Player(0);
     players[1] = new Player(1);
 
-    std::cout << "Jugadores creados, reseteando estado..." << std::endl;
     selectedTank = nullptr;
     currentPlayerIndex = 0;
     turnState = TurnState::SelectingTank;
     timeRemaining = MAX_TIME_SECONDS;
     winner = -1;
+
+    tankAnimStep = 0;
+    tankAnimFrameCounter = 0;
+    isTankMoving = false;
+    tankAnimPath.clear();
 
     if (currentBullet)
     {
@@ -176,25 +185,20 @@ void Game::initPlaying()
         currentBullet = nullptr;
     }
 
-    std::cout << "Iniciando clock..." << std::endl;
     gameClock.restart();
 
-    std::cout << "Actualizando HUD..." << std::endl;
     hud->updateCurrentPlayer(currentPlayerIndex + 1);
     hud->updateTimer(timeRemaining);
 
-    std::cout << "Inicializando vida de tanques..." << std::endl;
     for (int player = 0; player < 2; player++)
     {
         Tank **tanks = map->GetTanksOfPlayer(player);
         for (int i = 0; i < 4; i++)
         {
-            std::cout << "Tanque " << player << "," << i << std::endl;
             if (tanks[i] != nullptr)
                 hud->updateTankHealth(player + 1, i, 1.0f);
         }
     }
-    std::cout << "initPlaying completado" << std::endl;
 }
 
 void Game::initGameOver()
@@ -220,7 +224,10 @@ void Game::handleMainMenuEvents(PlayerAction &action)
     if (action.type == ActionType::LeftClick)
     {
         if (menuButtons[0]->isClicked(window, event))
+        {
+
             changeState(GameState::Playing);
+        }
         else if (menuButtons[1]->isClicked(window, event))
             changeState(GameState::Instructions);
         else if (menuButtons[2]->isClicked(window, event))
@@ -265,7 +272,6 @@ void Game::handlePlayingEvents(PlayerAction &action)
 
         if (turnState == TurnState::SelectingTank)
         {
-            // intentar seleccionar un tanque
             handleTankSelection(cell);
         }
         else if (turnState == TurnState::TankSelected)
@@ -278,8 +284,8 @@ void Game::handlePlayingEvents(PlayerAction &action)
                 if (tank != nullptr &&
                     isTankFromCurrentPlayer(tank))
                 {
-                    currentTankPath.clear(); // ← limpiar path anterior
-                    selectedTank = nullptr;  // ← limpiar selección anterior
+                    currentTankPath.clear();
+                    selectedTank = nullptr; 
                     handleTankSelection(cell);
                     return;
                 }
@@ -291,7 +297,6 @@ void Game::handlePlayingEvents(PlayerAction &action)
 
     case ActionType::RightClick:
     {
-        // solo disparar si hay un tanque seleccionado
         if (turnState != TurnState::TankSelected)
             return;
 
@@ -304,7 +309,6 @@ void Game::handlePlayingEvents(PlayerAction &action)
 
     case ActionType::ShiftPressed:
     {
-        // consumir power-up en cualquier momento del turno
         handlePowerUp();
         break;
     }
@@ -348,9 +352,15 @@ void Game::renderPlaying()
     renderer->drawMap(map);
     renderer->drawHoveredCell(inputHandler->getHoveredCell());
 
-    // dibujar path guardado
-    if (!currentTankPath.empty())
-        renderer->drawPath(currentTankPath, sf::Color(255, 255, 0, PATH_COLOR_ALPHA));
+   if (!currentTankPath.empty()) {
+    // mostrar solo el path restante
+    std::vector<Position> remainingPath(
+        currentTankPath.begin() + tankAnimStep,
+        currentTankPath.end()
+    );
+    renderer->drawPath(remainingPath, sf::Color(255, 255, 0, PATH_COLOR_ALPHA));
+}
+
 
     if (selectedTank != nullptr)
         renderer->drawSelectedTank(*selectedTank);
@@ -388,43 +398,52 @@ void Game::updateTimer()
 
 void Game::updateBullet()
 {
-    if (!currentBullet || !currentBullet->IsActive())
+    if (!currentBullet)
         return;
+
+    if (!currentBullet->IsActive())
+    {
+        turnState = TurnState::SelectingTank;
+        endTurn();
+        return;
+    }
+
+    // solo avanzar cada N frames
+    bulletFrameCounter++;
+    if (bulletFrameCounter < BULLET_FRAMES_PER_STEP)
+        return;
+    bulletFrameCounter = 0;
 
     currentBullet->Step();
 
     Position cell = currentBullet->GetCurrentCell();
 
-    // verificar que la celda sea válida
     if (cell.i < 0 || cell.i >= GRID_ROWS ||
         cell.j < 0 || cell.j >= GRID_COLS)
     {
         currentBullet->Deactivate();
         turnState = TurnState::SelectingTank;
+        endTurn();
         return;
     }
 
     Element *elem = map->GetElementAt(cell);
-
     if (elem == nullptr)
     {
         currentBullet->Deactivate();
         turnState = TurnState::SelectingTank;
+        endTurn();
         return;
     }
 
     if (currentBullet->IsTank(map, cell))
     {
         Tank *tank = map->GetTankIn(cell);
-        std::cout << "Bala toco tanque en: " << cell.i << "," << cell.j << std::endl;
-
         if (tank != nullptr)
         {
             PowerUp attackP = getAttackPowerUp();
-            std::cout << "AttackPowerUp: " << (int)attackP << std::endl;
             tank->DecreaseHealth(attackP);
 
-            // actualizar HUD
             Tank **tanksP0 = map->GetTanksOfPlayer(0);
             Tank **tanksP1 = map->GetTanksOfPlayer(1);
             for (int i = 0; i < 4; i++)
@@ -450,6 +469,30 @@ void Game::updateBullet()
         turnState = TurnState::SelectingTank;
         endTurn();
     }
+}
+
+void Game::updateTankAnimation() {
+    if (!isTankMoving) return;
+    if (tankAnimPath.empty()) return;
+
+    tankAnimFrameCounter++;
+    if (tankAnimFrameCounter < TANK_FRAMES_PER_STEP) return;
+    tankAnimFrameCounter = 0;
+
+    tankAnimStep++;
+
+    if (tankAnimStep >= (int)tankAnimPath.size()) {
+        isTankMoving = false;
+        tankAnimPath.clear();
+        tankAnimStep = 0;
+        endTurn();
+        return;
+    }
+
+    // mover el tanque a la siguiente celda
+    Position nextCell = tankAnimPath[tankAnimStep];
+    map->MoveTank(selectedTank, nextCell);
+    selectedTank = map->GetTankIn(nextCell);
 }
 
 void Game::checkWinCondition()
@@ -491,6 +534,8 @@ void Game::endTurn()
 {
     // consumir un turno del jugador actual
     players[currentPlayerIndex]->UseTurn();
+
+    players[currentPlayerIndex]->ClearPowerUp();
 
     // limpiar trazos de la pantalla
     renderer->clearPaths();
@@ -576,9 +621,6 @@ void Game::handleTankMovement(Position cell) {
     if (elem->GetType() != TypeElement::Floor) return;
 
     PowerUp movePrecise = getMovementPowerUp();
-    std::cout << "PowerUp activo: " << (int)movePrecise << std::endl;
-    std::cout << "Calculando path..." << std::endl;
-
     Element* mapGrid[GRID_ROWS][GRID_COLS];
     map->GetMap(mapGrid);
 
@@ -586,23 +628,24 @@ void Game::handleTankMovement(Position cell) {
     try {
         path = selectedTank->GetPath(cell, mapGrid, movePrecise);
     } catch (...) {
-        std::cout << "Error en GetPath" << std::endl;
         endTurn();
         return;
     }
 
-    std::cout << "Path calculado, size: " << path.size() << std::endl;
-
     if (path.empty()) {
-        std::cout << "Path vacio, turno perdido" << std::endl;
-        endTurn();  // ← terminar turno
+        endTurn();
         return;
     }
 
-    Position destination = path.back();
-    map->MoveTank(selectedTank, destination);
+    // guardar path para animación
     currentTankPath = path;
-    endTurn();
+    tankAnimPath = path;
+    tankAnimStep = 0;
+    tankAnimFrameCounter = 0;
+    isTankMoving = true;
+    
+    // cambiar estado para bloquear inputs mientras se mueve
+    turnState = TurnState::BulletMoving;
 }
 
 void Game::handleTankAttack(Position cell)
@@ -651,6 +694,8 @@ void Game::handleTankAttack(Position cell)
         return;
     }
 
+    std::cout << "Path de bala size: " << currentBullet->GetPath().size() << std::endl;
+    std::cout << "Bala activa: " << currentBullet->IsActive() << std::endl;
     turnState = TurnState::BulletMoving;
 }
 
@@ -685,16 +730,24 @@ void Game::changeState(GameState newState)
     switch (newState)
     {
     case GameState::MainMenu:
+        std::cout << "Iniciando MainMenu..." << std::endl;
         initMainMenu();
+        std::cout << "MainMenu iniciado" << std::endl;
         break;
     case GameState::Instructions:
+        std::cout << "Iniciando Instructions..." << std::endl;
         initInstructions();
+        std::cout << "Instructions iniciado" << std::endl;
         break;
     case GameState::Playing:
+        std::cout << "Iniciando Playing..." << std::endl;
         initPlaying();
+        std::cout << "Playing iniciado" << std::endl;
         break;
     case GameState::GameOver:
+        std::cout << "Iniciando GameOver..." << std::endl;
         initGameOver();
+        std::cout << "GameOver iniciado" << std::endl;
         break;
     }
 }
