@@ -3,8 +3,11 @@
 #include "../include/Directions.h"
 #include "../include/StructPosition.h"
 #include "../../UI/include/Constants.h"
+#include "../include/Pathfindings.h"
+#include "../include/EnumTypePath.h"
 #include <cmath>
 #include <random>
+#include <iostream>
 
 Bullet::Bullet(Position origin, Position destination,
                float damage, PowerUp attackAccuracy)
@@ -28,185 +31,212 @@ Bullet::Bullet(Position origin, Position destination,
     InitDirection();
 }
 
-void Bullet::CalculatePath(Map* map) {
+void Bullet::CalculatePath(Map *map)
+{
     path.clear();
-    
-    // posición temporal para simular
-    float simX = x;
-    float simY = y;
-    float simDx = dx;
-    float simDy = dy;
-    int simBounces = 0;
 
-    // límite de pasos para evitar loop infinito
-    int maxSteps = GRID_ROWS * GRID_COLS * 4;
-
-    for (int step = 0; step < maxSteps; step++) {
-        // avanzar posición
-        simX += simDx;
-        simY += simDy;
-
-        // convertir a celda
-        Position cell = {
-            (int)(simY / CELL_SIZE),
-            (int)(simX / CELL_SIZE)
-        };
-
-        // verificar si salió del mapa
-        if (IsOutOfBounds(cell)) {
-            break;
-        }
-
-        // agregar celda al path si es nueva
-        if (path.empty() || path.back() != cell) {
-            path.push_back(cell);
-        }
-
-        // verificar qué hay en la celda
-        Element* elem = map->GetElementAt(cell);
-
-        if (elem == nullptr) break;
-
-        if (elem->GetType() == TypeElement::Obstacle) {
-            if (simBounces >= maxBounces) break;  // agotó rebotes
-
-            // calcular tipo de rebote
-            // verificar celda horizontal (mismo i, diferente j)
-            Position horizontalCell = {cell.i, (int)((simX - simDx) / CELL_SIZE)};
-            Position verticalCell   = {(int)((simY - simDy) / CELL_SIZE), cell.j};
-
-            bool hitVerticalWall   = IsWall(map, horizontalCell);
-            bool hitHorizontalWall = IsWall(map, verticalCell);
-
-            if (hitVerticalWall && hitHorizontalWall) {
-                // esquina — invertir ambos
-                simDx = -simDx;
-                simDy = -simDy;
-            } else if (hitVerticalWall) {
-                simDx = -simDx;
-            } else {
-                simDy = -simDy;
-            }
-
-            simBounces++;
-
-            // retroceder para no quedar dentro del obstáculo
-            simX -= simDx;
-            simY -= simDy;
-
-        } else if (IsTank(map, cell)) {
-            // llegó a un tanque — terminar trayectoria
-            break;
-        }
-
-        // verificar si llegó al destino
-        if (cell == destination) break;
-    }
-}
-
-void Bullet::Step() {
-    if (!active) return;
-
-    // avanzar posición en píxeles
-    x += dx;
-    y += dy;
-
-    // actualizar celda actual
-    Position cell = PixelToCell();
-
-    // verificar si salió del mapa
-    if (IsOutOfBounds(cell)) {
-        active = false;
+    if (attackAccuracy == PowerUp::ATTACKACCURACY)
+    {
+        Element *mapGrid[GRID_ROWS][GRID_COLS];
+        map->GetMap(mapGrid);
+        path = Pathfinding::SelectAlgorithm(
+            TypePath::ASTAR_GAME,
+            mapGrid,
+            origin,
+            destination);
         return;
     }
 
-    // avanzar en el path precalculado
-    if (currentStep < path.size() - 1)
-        currentStep++;
-    else
-        active = false;  // llegó al final del path
-}
+    // trabajar en celdas en vez de pixeles
+    float simRow = origin.i + 0.5f; // centro de la celda en filas
+    float simCol = origin.j + 0.5f; // centro de la celda en columnas
 
-std::vector<Position> Bullet::GetPath() const {
-    return path;
-}
+    float length = std::sqrt(dx * dx + dy * dy);
+    float simDrow = (dy / length) * 0.1f; // paso pequeño en filas
+    float simDcol = (dx / length) * 0.1f; // paso pequeño en columnas
 
-sf::Vector2f Bullet::GetCurrentPixelPosition() const {
-    return sf::Vector2f(x, y);
-}
+    int simBounces = 0;
+    int maxSteps = GRID_ROWS * GRID_COLS * 100;
+    Position lastCell = origin;
 
-Position Bullet::GetCurrentCell() const {
-    return PixelToCell();
-}
+    for (int step = 0; step < maxSteps; step++)
+    {
+        simRow += simDrow;
+        simCol += simDcol;
 
-float Bullet::GetDamage() const {
-    return damage;
-}
+        Position cell = {(int)simRow, (int)simCol};
 
-bool Bullet::IsActive() const {
-    return active;
-}
+        if (IsOutOfBounds(cell))
+            break;
 
-bool Bullet::HasReachedDestination() const {
-    return !active || GetCurrentCell() == destination;
-}
+        // solo procesamos en el caso de que la bala haya entrado a una nueva celda
+        if (cell == lastCell)
+            continue;
+        lastCell = cell;
 
-int Bullet::GetMaxBounces() const {
-    return maxBounces;
-}
+        Element *elem = map->GetElementAt(cell);
+        if (elem == nullptr)
+            break;
 
-void Bullet::Deactivate() {
-    active = false;
-}
+        if (elem->GetType() == TypeElement::Obstacle)
+        {
+            if (simBounces >= maxBounces)
+                break;
 
-void Bullet::InitDirection() {
-    // destino en píxeles (centro de la celda)
-    float destX = destination.j * CELL_SIZE + CELL_SIZE / 2.0f;
-    float destY = destination.i * CELL_SIZE + CELL_SIZE / 2.0f;
+            // retroceder a celda anterior
+            simRow -= simDrow * 2;
+            simCol -= simDcol * 2;
 
-    // vector hacia el destino
-    float diffX = destX - x;
-    float diffY = destY - y;
+            // verificar tipo de rebote
+            Position cellX = {(int)simRow, (int)(simCol + simDcol * 2)};
+            Position cellY = {(int)(simRow + simDrow * 2), (int)simCol};
 
-    // normalizar
-    float length = std::sqrt(diffX * diffX + diffY * diffY);
-    if (length > 0) {
-        dx = (diffX / length) * BULLET_SPEED;
-        dy = (diffY / length) * BULLET_SPEED;
-    } else {
-        dx = 0;
-        dy = 0;
-        active = false;  // origen == destino, bala inválida
+            bool wallOnX = !IsOutOfBounds(cellX) && IsWall(map, cellX);
+            bool wallOnY = !IsOutOfBounds(cellY) && IsWall(map, cellY);
+
+            if (wallOnX && wallOnY)
+            {
+                simDcol = -simDcol;
+                simDrow = -simDrow;
+            }
+            else if (wallOnX)
+            {
+                simDcol = -simDcol;
+            }
+            else if (wallOnY)
+            {
+                simDrow = -simDrow;
+            }
+            else
+            {
+                simDcol = -simDcol;
+                simDrow = -simDrow;
+            }
+
+            simBounces++;
+            lastCell = {(int)simRow, (int)simCol};
+        }
+        else if (IsTank(map, cell))
+        {
+            path.push_back(cell);
+            break;
+        }
+        else
+        {
+            path.push_back(cell);
+        }
     }
 }
 
-Position Bullet::PixelToCell() const {
-    return {
-        (int)(y / CELL_SIZE),
-        (int)(x / CELL_SIZE)
-    };
+void Bullet::Step()
+{
+    if (!active)
+        return;
+
+    // avanzar al siguiente paso del path
+    if (currentStep < (int)path.size() - 1)
+    {
+        currentStep++;
+        // actualizar posición en píxeles al centro de la celda actual
+        Position cell = path[currentStep];
+        x = cell.j * CELL_SIZE + CELL_SIZE / 2.0f;
+        y = cell.i * CELL_SIZE + CELL_SIZE / 2.0f;
+    }
+    else
+    {
+        active = false;
+    }
 }
 
-bool Bullet::IsOutOfBounds(Position cell) const {
+std::vector<Position> Bullet::GetPath() const
+{
+    return path;
+}
+
+sf::Vector2f Bullet::GetCurrentPixelPosition() const
+{
+    return sf::Vector2f(x, y);
+}
+
+Position Bullet::GetCurrentCell() const
+{
+    return PixelToCell();
+}
+
+float Bullet::GetDamage() const
+{
+    return damage;
+}
+
+bool Bullet::IsActive() const
+{
+    return active;
+}
+
+bool Bullet::HasReachedDestination() const
+{
+    return !active || GetCurrentCell() == destination;
+}
+
+int Bullet::GetMaxBounces() const
+{
+    return maxBounces;
+}
+
+void Bullet::Deactivate()
+{
+    active = false;
+}
+
+void Bullet::InitDirection()
+{
+    float destX = destination.j * CELL_SIZE + CELL_SIZE / 2.0f;
+    float destY = destination.i * CELL_SIZE + CELL_SIZE / 2.0f;
+    float diffX = destX - x;
+    float diffY = destY - y;
+    float length = std::sqrt(diffX * diffX + diffY * diffY);
+    if (length > 0)
+    {
+        dx = (diffX / length) * BULLET_SPEED;
+        dy = (diffY / length) * BULLET_SPEED;
+    }
+    std::cout << "dx: " << dx << " dy: " << dy << std::endl;
+}
+
+Position Bullet::PixelToCell() const
+{
+    return {
+        (int)(y / CELL_SIZE),
+        (int)(x / CELL_SIZE)};
+}
+
+bool Bullet::IsOutOfBounds(Position cell) const
+{
     return cell.i < 0 || cell.i >= GRID_ROWS ||
            cell.j < 0 || cell.j >= GRID_COLS;
 }
 
-bool Bullet::IsWall(Map* map, Position cell) const {
-    if (IsOutOfBounds(cell)) return true;
-    Element* elem = map->GetElementAt(cell);
-    return elem != nullptr && 
+bool Bullet::IsWall(Map *map, Position cell) const
+{
+    if (IsOutOfBounds(cell))
+        return true;
+    Element *elem = map->GetElementAt(cell);
+    return elem != nullptr &&
            elem->GetType() == TypeElement::Obstacle;
 }
 
-bool Bullet::IsTank(Map* map, Position cell) const {
-   if (IsOutOfBounds(cell)) return false;
-    
-    Element* elem = map->GetElementAt(cell);
-    if (elem == nullptr || elem->GetType() != TypeElement::Tank) return false;
+bool Bullet::IsTank(Map *map, Position cell) const
+{
+    if (IsOutOfBounds(cell))
+        return false;
+
+    Element *elem = map->GetElementAt(cell);
+    if (elem == nullptr || elem->GetType() != TypeElement::Tank)
+        return false;
 
     // Ignorar al tank de origen solo si no ha rebotado
-    if (cell == origin && bounces == 0) return false;
+    if (cell == origin && bounces == 0)
+        return false;
 
     return true;
 }
