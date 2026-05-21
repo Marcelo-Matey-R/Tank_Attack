@@ -29,8 +29,10 @@ void Map::InitMap(){
 
     std::cout << "Inicializando mapa a nullptr..." << std::endl;
     for (int i = 0; i < GRID_ROWS; i++)
-        for (int j = 0; j < GRID_COLS; j++)
+        for (int j = 0; j < GRID_COLS; j++){
+            if(map[i][j] == nullptr) continue;
             map[i][j] = nullptr;
+        }
 
     std::cout << "Llamando FillMap..." << std::endl;
     FillMap();
@@ -42,6 +44,14 @@ void Map::InitMap(){
 }
 
 void Map::ResetMap(){
+    for (int i = 0; i < GRID_ROWS; i++){
+        for (int j = 0; j < GRID_COLS; j++){
+            if (map[i][j] != nullptr && map[i][j]->GetType() == TypeElement::Tank){
+                map[i][j] = nullptr;
+            }
+        }
+    }
+
     if (tanksPlayer0 != nullptr){
         for(int i = 0; i < 4; i++){
             if(tanksPlayer0[i] == nullptr) continue;

@@ -416,7 +416,7 @@ std::vector<Position> Pathfinding::LOS(Element *(&map)[GRID_ROWS][GRID_COLS], co
     for (int i = 0; i < distance.i; i++)
     {
         tmp += directionToMoveRows;
-        if ((IsInvalidPosition(tmp) || map[tmp.i][tmp.j]->GetType() != TypeElement::Floor) && tmp != destiny)
+        if (IsInvalidPosition(tmp) || map[tmp.i][tmp.j]->GetType() != TypeElement::Floor)
         {
             return std::vector<Position>();
         }
@@ -427,7 +427,7 @@ std::vector<Position> Pathfinding::LOS(Element *(&map)[GRID_ROWS][GRID_COLS], co
     for (int i = 0; i < distance.j; i++)
     {
         tmp += directionToMoveCols;
-        if ((IsInvalidPosition(tmp) || map[tmp.i][tmp.j]->GetType() != TypeElement::Floor) && tmp != destiny)
+        if ((IsInvalidPosition(tmp) || map[tmp.i][tmp.j]->GetType() != TypeElement::Floor))
         {
             return std::vector<Position>();
         }
