@@ -55,7 +55,6 @@ void Bullet::CalculatePath(Map *map)
     float simDrow = (dy / length) * 0.1f; // paso pequeño en filas
     float simDcol = (dx / length) * 0.1f; // paso pequeño en columnas
 
-    int simBounces = 0;
     int maxSteps = GRID_ROWS * GRID_COLS * 100;
     Position lastCell = origin;
 
@@ -80,7 +79,7 @@ void Bullet::CalculatePath(Map *map)
 
         if (elem->GetType() == TypeElement::Obstacle)
         {
-            if (simBounces >= maxBounces)
+            if (bounces >= maxBounces)
                 break;
 
             // retroceder a celda anterior
@@ -113,7 +112,7 @@ void Bullet::CalculatePath(Map *map)
                 simDrow = -simDrow;
             }
 
-            simBounces++;
+            bounces++;
             lastCell = {(int)simRow, (int)simCol};
         }
         else if (IsTank(map, cell))

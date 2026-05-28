@@ -19,6 +19,7 @@ class Pathfinding{
     static std::vector<Position> A_Star_Game(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
     static void RandomMoves(Element* (&map)[GRID_ROWS][GRID_COLS], std::vector<Position> &pos, const Position &start);
     static std::vector<Position> A_Star_Map(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
+    static bool MoveToThisDirections(Element *(&map)[GRID_ROWS][GRID_COLS], std::vector<Position>& positions, Position &start, const int &distance, const Position &directionToMove);
     static std::vector<Position> LOS(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
     static std::vector<Position> AleatoryMovement(Element* (&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny);
     public:
