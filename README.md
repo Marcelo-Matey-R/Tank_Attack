@@ -23,7 +23,7 @@ Para compilar el proyecto se necesita:
 
 
 
-## Compilación
+### Compilación
 
 Desde la raíz del proyecto:
 
