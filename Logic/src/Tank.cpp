@@ -6,7 +6,7 @@
 
 #pragma region Tank Light Blue and Tank Blue
 
-std::vector<Position> Tank::GetPath(Position destination, Element *(&map)[GRID_ROWS][GRID_COLS], PowerUp movePrecise)
+Array<Position> Tank::GetPath(Position destination, Element *(&map)[GRID_ROWS][GRID_COLS], PowerUp movePrecise)
 {
     TypePath pathType = SelectPathfinding(movePrecise);
 

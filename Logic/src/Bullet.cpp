@@ -33,7 +33,7 @@ Bullet::Bullet(Position origin, Position destination,
 
 void Bullet::CalculatePath(Map *map)
 {
-    path.clear();
+    path.Clear();
 
     if (attackAccuracy == PowerUp::ATTACKACCURACY)
     {
@@ -117,12 +117,12 @@ void Bullet::CalculatePath(Map *map)
         }
         else if (IsTank(map, cell))
         {
-            path.push_back(cell);
+            path.PushBack(cell);
             break;
         }
         else
         {
-            path.push_back(cell);
+            path.PushBack(cell);
         }
     }
 }
@@ -133,7 +133,7 @@ void Bullet::Step()
         return;
 
     // avanzar al siguiente paso del path
-    if (currentStep < (int)path.size() - 1)
+    if (currentStep < (int)path.Size() - 1)
     {
         currentStep++;
         // actualizar posición en píxeles al centro de la celda actual
@@ -147,7 +147,7 @@ void Bullet::Step()
     }
 }
 
-std::vector<Position> Bullet::GetPath() const
+Array<Position> Bullet::GetPath() const
 {
     return path;
 }

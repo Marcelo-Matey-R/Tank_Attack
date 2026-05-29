@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include <vector>
+#include "../../include/MyArray.h"
 #include <random>
 #include "Element.h"
 #include "StructPosition.h"
@@ -47,7 +47,7 @@ public:
     float GetLife() const { return life; }
     ColorTank GetColor() const { return color; }                                                      // Devuelve el color del tanque
     Position GetPosition() const { return position; }                                                 // Devuelve la posicion
-    std::vector<Position> GetPath(Position destination, Element* (&map)[GRID_ROWS][GRID_COLS], PowerUp movePrecise = PowerUp::NULL_POWERUP); // Devuelve el Path para ir al destino
+    Array<Position> GetPath(Position destination, Element* (&map)[GRID_ROWS][GRID_COLS], PowerUp movePrecise = PowerUp::NULL_POWERUP); // Devuelve el Path para ir al destino
 };
 
 // Subclases de tanque

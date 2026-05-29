@@ -137,7 +137,7 @@ void Renderer::drawSelectedTank(const Tank &tank)
     window.draw(selection);
 }
 
-void Renderer::drawMainMenu(const std::vector<Button *> &buttons)
+void Renderer::drawMainMenu(const Array<class Button *> &buttons)
 {
     // título
     sf::Text title;
@@ -159,7 +159,7 @@ void Renderer::drawMainMenu(const std::vector<Button *> &buttons)
         button->draw(window);
 }
 
-void Renderer::drawInstructions(const std::vector<Button *> &buttons)
+void Renderer::drawInstructions(const Array<class Button *> &buttons)
 {
     // título
     sf::Text title;
@@ -230,7 +230,7 @@ void Renderer::drawInstructions(const std::vector<Button *> &buttons)
         button->draw(window);
 }
 
-void Renderer::drawGameOver(int winnerID, int player1Tanks, int player2Tanks, const std::vector<Button *> &buttons)
+void Renderer::drawGameOver(int winnerID, int player1Tanks, int player2Tanks, const Array<class Button *> &buttons)
 {
     // título
     sf::Text title;
@@ -318,7 +318,7 @@ void Renderer::drawBulletPath(const Bullet &bullet)
     if (!bullet.IsActive())
         return;
 
-    std::vector<Position> path = bullet.GetPath();
+    Array<Position> path = bullet.GetPath();
 
     for (const Position &cell : path)
     {
@@ -332,7 +332,7 @@ void Renderer::drawBulletPath(const Bullet &bullet)
     }
 }
 
-void Renderer::drawPath(const std::vector<Position> &path, sf::Color color)
+void Renderer::drawPath(const Array<Position> &path, sf::Color color)
 {
     for (const Position &cell : path)
     {
@@ -348,8 +348,8 @@ void Renderer::drawPath(const std::vector<Position> &path, sf::Color color)
 
 void Renderer::clearPaths()
 {
-    currentTankPath.clear();
-    currentBulletPath.clear();
+    currentTankPath.Clear();
+    currentBulletPath.Clear();
 }
 
 void Renderer::setUseSprites(bool useSprites)

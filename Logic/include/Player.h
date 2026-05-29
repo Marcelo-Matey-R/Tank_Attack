@@ -1,4 +1,5 @@
-#include <queue>
+#include "../../include/MyQueue.h"
+#include "../../include/MyArray.h"
 #include "EnumPowerUp.h"
 #include "Tank.h"
 #ifndef PLAYER_H
@@ -8,7 +9,7 @@ class Player
 {
 private:
     int id_player;
-    std::queue<PowerUp> powerUps;
+    Queue<PowerUp> powerUps;
     PowerUp powerUpInUse;
     int turns;
 

@@ -85,16 +85,16 @@ void HUD::updateTankHealth(int playerID, int tankIndex, float healthPercent) {
         healthBar[playerID - 1][tankIndex].setFillColor(sf::Color::Red);
 }
 
-void HUD::updatePowerUpQueue(int playerID, const std::vector<std::string>& powerUps) {
+void HUD::updatePowerUpQueue(int playerID, const Array<std::string>& powerUps) {
     powerUpQueue[playerID - 1] = powerUps;
     
     std::string text = "J" + std::to_string(playerID) + ": ";
-    if (powerUps.empty()) {
+    if (powerUps.IsEmpty()) {
         text += "ninguno";
     } else {
-        for (int i = 0; i < powerUps.size(); i++) {
+        for (int i = 0; i < powerUps.Size(); i++) {
             text += powerUps[i];
-            if (i < powerUps.size() - 1)
+            if (i < powerUps.Size() - 1)
                 text += ", ";
         }
     }

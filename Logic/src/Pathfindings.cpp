@@ -1,21 +1,22 @@
 #include "Pathfindings.h"
+#include "StructPosition.h"
 #include "Directions.h"
 #include "StructNodes.h"
 #include "Element.h"
-#include <queue>
+#include "../../include/MyQueue.h"
 #include <unordered_set>
 #include <unordered_map>
 #include <algorithm>
 #include <random>
 #include <iostream>
 
-std::vector<Position> Pathfinding::ReconstructorPath(Position (*predecessors)[GRID_COLS], const Position &start, const Position &destiny){
-    std::vector<Position> shortestPath;
+Array<Position> Pathfinding::ReconstructorPath(Position (*predecessors)[GRID_COLS], const Position &start, const Position &destiny){
+    Array<Position> shortestPath;
     Position currentNode = destiny;
     std::cout << "Reconstruyendo path desde: " << destiny.i << "," << destiny.j
               << " hasta: " << start.i << "," << start.j << std::endl;
     while (currentNode != Position{-1, -1}){
-        shortestPath.push_back(currentNode);
+        shortestPath.PushBack(currentNode);
         std::cout<<"El nodo actual esta en la posicion: "<<currentNode.i<<", "<<currentNode.j<<"\n";
         currentNode = predecessors[currentNode.i][currentNode.j];
 
@@ -23,7 +24,7 @@ std::vector<Position> Pathfinding::ReconstructorPath(Position (*predecessors)[GR
         // si es inválido pero no es el sentinel, algo salió mal
         if (IsInvalidPosition(currentNode) && currentNode != Position{-1, -1}){
             std::cout << "Predecesor genuinamente invalido" << std::endl;
-            shortestPath.clear();  // path corrupto, mejor retornar vacío
+            shortestPath.Clear();  // path corrupto, mejor retornar vacío
             return shortestPath;
         }
     }
@@ -40,18 +41,18 @@ int Pathfinding::Heuristic(const Position &start, const Position &destiny){
     return manhattan.i + manhattan.j;
 }
 
-std::vector<Position> Pathfinding::Bfs(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
+Array<Position> Pathfinding::Bfs(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
     std::cout << "BFS desde: " << start.i << "," << start.j
               << " hasta: " << destiny.i << "," << destiny.j << std::endl;
 
     // si origen == destino
     if (start == destiny){
         std::cout << "Origen == destino" << std::endl;
-        return std::vector<Position>();
+        return Array<Position>();
     }
 
-    std::deque<Position> queue;
-    queue.push_back(start);
+    Array<Position> queue;
+    queue.PushBack(start);
 
     Position predecessors[GRID_ROWS][GRID_COLS];
     bool visited[GRID_ROWS][GRID_COLS];
@@ -62,10 +63,10 @@ std::vector<Position> Pathfinding::Bfs(Element *(&map)[GRID_ROWS][GRID_COLS], co
     predecessors[start.i][start.j] = Position{-1, -1};
     visited[start.i][start.j] = true;
 
-    while (!queue.empty())
+    while (!queue.IsEmpty())
     {
-        Position currentNode = std::move(queue.front());
-        queue.pop_front();
+        Position currentNode = std::move(queue.Front());
+        queue.PopFront();
 
         if (currentNode == destiny)
             return ReconstructorPath(predecessors, start, destiny);
@@ -76,22 +77,22 @@ std::vector<Position> Pathfinding::Bfs(Element *(&map)[GRID_ROWS][GRID_COLS], co
             if (!IsInvalidPosition(neighbor) && (map[neighbor.i][neighbor.j]->GetType() == TypeElement::Floor) && !visited[neighbor.i][neighbor.j]) // ← faltaba el !
             {
                 visited[neighbor.i][neighbor.j] = true;
-                queue.push_back(neighbor);
+                queue.PushBack(neighbor);
                 predecessors[neighbor.i][neighbor.j] = currentNode;
             }
         }
     }
     std::cout << "BFS no encontro camino" << std::endl;
-    return std::vector<Position>();
+    return Array<Position>();
 }
 
 void Pathfinding::FloodFill(Element *(&map)[GRID_ROWS][GRID_COLS], int (&zones)[GRID_ROWS][GRID_COLS], const Position &start, int actualColor){
-    std::deque<Position> queue;
-    queue.push_back(start);
+    Array<Position> queue;
+    queue.PushBack(start);
     zones[start.i][start.j] = actualColor;
-    while (!queue.empty()){
-        Position currentNode = std::move(queue.front());
-        queue.pop_front();
+    while (!queue.IsEmpty()){
+        Position currentNode = std::move(queue.Front());
+        queue.PopFront();
 
         for (auto direction : directions){
             Position neighbor = currentNode + direction;
@@ -105,7 +106,7 @@ void Pathfinding::FloodFill(Element *(&map)[GRID_ROWS][GRID_COLS], int (&zones)[
                 continue;
 
             zones[neighbor.i][neighbor.j] = actualColor;
-            queue.push_back(neighbor);
+            queue.PushBack(neighbor);
         }
     }
 }
@@ -154,11 +155,10 @@ bool Pathfinding::IsConected(Element *(&map)[GRID_ROWS][GRID_COLS], const Positi
     return false;
 }
 
-std::vector<Position> Pathfinding::Dijkstra(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
-      std::cout << "Dijkstra desde: " << start.i << "," << start.j 
-              << " hasta: " << destiny.i << "," << destiny.j << std::endl;
-    std::priority_queue<Node> pq;
-    pq.push(Node{start, 0});
+Array<Position> Pathfinding::Dijkstra(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
+      std::cout << "Dijkstra desde: " << start.i << "," << start.j << " hasta: " << destiny.i << "," << destiny.j << std::endl;
+    MiPriorityQueue<Node> pq;
+    pq.Enqueue(Node{start, 0}, 0);
 
     Position predecessors[GRID_ROWS][GRID_COLS];
     int costSoFar[GRID_ROWS][GRID_COLS];
@@ -171,9 +171,9 @@ std::vector<Position> Pathfinding::Dijkstra(Element *(&map)[GRID_ROWS][GRID_COLS
     predecessors[start.i][start.j] = Position{-1, -1};
     costSoFar[start.i][start.j] = 0;
 
-    while (!pq.empty()){
-        Node currentNode = pq.top();
-        pq.pop();
+    while (!pq.IsEmpty()){
+        Node currentNode = pq.Peek();
+        pq.Dequeue();
 
         // ← marcar como visitado al sacar de la cola
         if (visited[currentNode.pos.i][currentNode.pos.j])
@@ -199,18 +199,18 @@ std::vector<Position> Pathfinding::Dijkstra(Element *(&map)[GRID_ROWS][GRID_COLS
 
             if (newCost < costSoFar[neighborPos.i][neighborPos.j]){
                 costSoFar[neighborPos.i][neighborPos.j] = newCost;
-                pq.push(Node{neighborPos, newCost});
+                pq.Enqueue(Node{neighborPos, newCost}, newCost);
                 predecessors[neighborPos.i][neighborPos.j] = currentNode.pos;
             }
         }
     }
     std::cout << "Dijkstra no encontro camino" << std::endl;
-    return std::vector<Position>();
+    return Array<Position>();
 }
 
-std::vector<Position> Pathfinding::A_Star_Game(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
-    std::priority_queue<Node> pq;
-    pq.push(Node{start, Heuristic(start, destiny)});
+Array<Position> Pathfinding::A_Star_Game(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
+    MiPriorityQueue<Node> pq;
+    pq.Enqueue(Node{start, Heuristic(start, destiny)}, Heuristic(start, destiny));
 
     Position predecessors[GRID_ROWS][GRID_COLS];
     int costSoFar[GRID_ROWS][GRID_COLS];
@@ -223,9 +223,9 @@ std::vector<Position> Pathfinding::A_Star_Game(Element *(&map)[GRID_ROWS][GRID_C
     predecessors[start.i][start.j] = Position{-1, -1};
     costSoFar[start.i][start.j] = 0;
 
-    while (!pq.empty()){
-        Node currentNode = pq.top();
-        pq.pop();
+    while (!pq.IsEmpty()){
+        Node currentNode = pq.Peek();
+        pq.Dequeue();
 
         if(visited[currentNode.pos.i][currentNode.pos.j]) continue;
         visited[currentNode.pos.i][currentNode.pos.j] = true;
@@ -250,20 +250,20 @@ std::vector<Position> Pathfinding::A_Star_Game(Element *(&map)[GRID_ROWS][GRID_C
             if (cost == INF || newCost < cost){
                 costSoFar[neighborPos.i][neighborPos.j] = newCost;
                 int priority = newCost + Heuristic(neighborPos, destiny);
-                pq.push(Node{neighborPos, priority});
+                pq.Enqueue(Node{neighborPos, priority}, priority);
                 predecessors[neighborPos.i][neighborPos.j] = currentNode.pos;
             }
         }
     }
 
-    return std::vector<Position>();
+    return Array<Position>();
 }
 
-std::vector<Position> Pathfinding::A_Star_Map(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
-    std::priority_queue<Node> pq;
-    pq.push(Node{start, Heuristic(start, destiny)});
+Array<Position> Pathfinding::A_Star_Map(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
+    MiPriorityQueue<Node> pq;
+    pq.Enqueue(Node{start, Heuristic(start, destiny)}, Heuristic(start, destiny));
 
-    std::vector<Position> obstacles;
+    Array<Position> obstacles;
 
     Position predecessors[GRID_ROWS][GRID_COLS];
     int costSoFar[GRID_ROWS][GRID_COLS];
@@ -278,9 +278,9 @@ std::vector<Position> Pathfinding::A_Star_Map(Element *(&map)[GRID_ROWS][GRID_CO
 
     int weightDestiny = 1;
 
-    while (!pq.empty()){
-        Node currentNode = pq.top();
-        pq.pop();
+    while (!pq.IsEmpty()){
+        Node currentNode = pq.Peek();
+        pq.Dequeue();
 
         if(visited[currentNode.pos.i][currentNode.pos.j]) continue;
         visited[currentNode.pos.i][currentNode.pos.j] = true;
@@ -290,7 +290,7 @@ std::vector<Position> Pathfinding::A_Star_Map(Element *(&map)[GRID_ROWS][GRID_CO
                 if (map[p.i][p.j]->GetType() != TypeElement::Obstacle)
                     continue;
 
-                obstacles.push_back(p);
+                obstacles.PushBack(p);
             }
 
             return obstacles;
@@ -302,35 +302,41 @@ std::vector<Position> Pathfinding::A_Star_Map(Element *(&map)[GRID_ROWS][GRID_CO
             if (IsInvalidPosition(neighborPos))
                 continue;
 
+            if (visited[neighborPos.i][neighborPos.j])
+                continue;
+
             int newCost = 0;
 
             if (neighborPos == destiny){
                 newCost = costSoFar[currentNode.pos.i][currentNode.pos.j] + weightDestiny;
             }
-
             else{
                 newCost = costSoFar[currentNode.pos.i][currentNode.pos.j] + map[neighborPos.i][neighborPos.j]->GetWeightMap();
             }
 
+            // protección contra overflow: si el costo se desbordó, ignorar
+            if (newCost < 0)
+                continue;
+
             int cost = costSoFar[neighborPos.i][neighborPos.j];
 
-            if (cost == INF || newCost < cost){
+            if (cost == (int)INF || newCost < cost){
                 costSoFar[neighborPos.i][neighborPos.j] = newCost;
                 int priority = newCost + Heuristic(neighborPos, destiny);
-                pq.push(Node{neighborPos, priority});
+                pq.Enqueue(Node{neighborPos, priority}, priority);
                 predecessors[neighborPos.i][neighborPos.j] = currentNode.pos;
             }
         }
     }
 
-    return std::vector<Position>();
+    return Array<Position>();
 }
 
 bool Pathfinding::IsInvalidPosition(const Position &neighborPos){
     return neighborPos.i < 0 || neighborPos.i >= GRID_ROWS || neighborPos.j < 0 || neighborPos.j >= GRID_COLS;
 }
 
-void Pathfinding::RandomMoves(Element *(&map)[GRID_ROWS][GRID_COLS], std::vector<Position> &pos, const Position &start){
+void Pathfinding::RandomMoves(Element *(&map)[GRID_ROWS][GRID_COLS], Array<Position> &pos, const Position &start){
     Position tmp = start;
     int moves = 0;
     static std::mt19937 gen(std::random_device{}());
@@ -359,41 +365,41 @@ void Pathfinding::RandomMoves(Element *(&map)[GRID_ROWS][GRID_COLS], std::vector
             moves++;
             continue;
         }
-        pos.push_back(tmp);
+        pos.PushBack(tmp);
         moves++;
     }
 }
 
-bool Pathfinding::MoveToThisDirections(Element *(&map)[GRID_ROWS][GRID_COLS], std::vector<Position>& positions, Position &start, const int &distance, const Position &directionToMove){
+bool Pathfinding::MoveToThisDirections(Element *(&map)[GRID_ROWS][GRID_COLS], Array<Position>& positions, Position &start, const int &distance, const Position &directionToMove){
     Position tmp = start; 
     for (int i = 0; i < distance; i++){
         tmp += directionToMove;
         if (IsInvalidPosition(tmp) || map[tmp.i][tmp.j]->GetType() != TypeElement::Floor){
-            positions.clear();
+            positions.Clear();
             return false;
         }
 
-        positions.push_back(tmp);
+        positions.PushBack(tmp);
     }
 
     start = tmp;
     return true;
 }
 
-std::vector<Position> Pathfinding::LOS(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
+Array<Position> Pathfinding::LOS(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
     Position distance = start - destiny;
     std::cout<<"La distancia entre: "<<start.i<<','<<start.j<<" y "<<destiny.i<<','<<destiny.j<<" es igual a "<<distance.i<<','<<distance.j<<'\n';
     Position tmp = start;
     Position directionToMoveRows = (start.i > destiny.i) ? up : down;
     Position directionToMoveCols = (start.j > destiny.j) ? left : right;
-    std::vector<Position> positions;
+    Array<Position> positions;
     
     //Movimiento vertical --> horizontal
     bool success = MoveToThisDirections(map, positions, tmp, distance.i, directionToMoveRows) && MoveToThisDirections(map, positions, tmp, distance.j, directionToMoveCols);
 
     // Si falla entonces probar movimiento horizontal --> vertical
     if(!success){
-        positions.clear();
+        positions.Clear();
         tmp = start;
         success = MoveToThisDirections(map, positions, tmp, distance.j, directionToMoveCols) && MoveToThisDirections(map, positions, tmp, distance.i, directionToMoveRows); 
     }
@@ -401,7 +407,7 @@ std::vector<Position> Pathfinding::LOS(Element *(&map)[GRID_ROWS][GRID_COLS], co
     // Si ningun camino funciono devuelvo de una vez la lista vacia
     if(!success) return positions;
 
-    positions.insert(positions.begin(), start);
+    positions.Insert(positions.begin(), start);
 
     for(auto p : positions){
         std::cout<<"El nodo actual es: "<<p.i<<", "<<p.j<<'\n';
@@ -409,26 +415,26 @@ std::vector<Position> Pathfinding::LOS(Element *(&map)[GRID_ROWS][GRID_COLS], co
     return positions;
 }
 
-std::vector<Position> Pathfinding::AleatoryMovement(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
+Array<Position> Pathfinding::AleatoryMovement(Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
   std::cout << "AleatoryMovement desde: " << start.i << "," << start.j 
               << " hasta: " << destiny.i << "," << destiny.j << std::endl;
     
-    std::vector<Position> path = LOS(map, start, destiny);
-    std::cout << "LOS path size: " << path.size() << std::endl;
+    Array<Position> path = LOS(map, start, destiny);
+    std::cout << "LOS path size: " << path.Size() << std::endl;
 
-    if(!path.empty()){ 
+    if(!path.IsEmpty()){ 
         return path;
     }
 
     RandomMoves(map, path, start);
-    std::cout << "RandomMoves path size: " << path.size() << std::endl;
+    std::cout << "RandomMoves path size: " << path.Size() << std::endl;
 
-    if(!path.empty()){
-        Position newStart = path.back();
-        std::vector<Position> temp2 = LOS(map, newStart, destiny);
+    if(!path.IsEmpty()){
+        Position newStart = path.Back();
+        Array<Position> temp2 = LOS(map, newStart, destiny);
         
-        if(!temp2.empty()){
-            path.insert(path.end(), temp2.begin()+1, temp2.end());
+        if(!temp2.IsEmpty()){
+            path.Insert(path.end(), temp2.begin(), temp2.end());
             return path;
         }
     }
@@ -437,7 +443,7 @@ std::vector<Position> Pathfinding::AleatoryMovement(Element *(&map)[GRID_ROWS][G
     return Bfs(map, start, destiny);
 }
 
-std::vector<Position> Pathfinding::SelectAlgorithm(TypePath path, Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
+Array<Position> Pathfinding::SelectAlgorithm(TypePath path, Element *(&map)[GRID_ROWS][GRID_COLS], const Position &start, const Position &destiny){
     switch (path){
     case TypePath::ALEATORYMOVEMENT:
         return AleatoryMovement(map, start, destiny);
@@ -458,7 +464,7 @@ std::vector<Position> Pathfinding::SelectAlgorithm(TypePath path, Element *(&map
         return LOS(map, start, destiny);
 
     default:
-        return std::vector<Position>();
+        return Array<Position>();
         break;
     }
 }

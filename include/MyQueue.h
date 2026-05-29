@@ -221,8 +221,8 @@ void MiPriorityQueue<T, P>::Enqueue(const T& value, const P& priority){
 
     NodePriorityQueue<T, P>* newNode = new NodePriorityQueue<T, P>{value, priority, nullptr};
 
-    // insertar al inicio
-    if (IsEmpty() || priority > head->priority) {
+    // insertar al inicio si la prioridad es MENOR (MIN-heap: menor costo = mayor urgencia)
+    if (IsEmpty() || priority < head->priority) {
 
         newNode->next = head;
         head = newNode;
@@ -231,7 +231,7 @@ void MiPriorityQueue<T, P>::Enqueue(const T& value, const P& priority){
 
         NodePriorityQueue<T, P>* current = head;
 
-        while(current->next != nullptr && current->next->priority >= priority){
+        while(current->next != nullptr && current->next->priority <= priority){
             current = current->next;
         }
 

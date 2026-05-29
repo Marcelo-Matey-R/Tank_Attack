@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <vector>
+#include "MyArray.h"
 #include "Constants.h"
 #include "Button.h"
 #include "Renderer.h"
@@ -41,12 +41,12 @@ private:
     sf::Font font;
     GameState currentState;
     Bullet *currentBullet = nullptr; // bala activa actualmente
-    std::vector<Position> currentTankPath;
+    Array<Position> currentTankPath;
     int bulletFrameCounter = 0;
     const int BULLET_FRAMES_PER_STEP = 10; // frames entre cada celda
 
     // animación de movimiento del tanque
-    std::vector<Position> tankAnimPath;
+    Array<Position> tankAnimPath;
     int tankAnimStep;
     int tankAnimFrameCounter;
     const int TANK_FRAMES_PER_STEP = 5;
@@ -58,9 +58,9 @@ private:
     HUD *hud;
 
     // Botones por pantalla
-    std::vector<Button *> menuButtons;
-    std::vector<Button *> instructionButtons;
-    std::vector<Button *> gameOverButtons;
+    Array<Button *> menuButtons;
+    Array<Button *> instructionButtons;
+    Array<Button *> gameOverButtons;
 
     // Game loop
     void handleEvents();
@@ -107,7 +107,7 @@ private:
     void handlePowerUp();
 
     // Helpers
-    void clearButtons(std::vector<Button *> &buttons);
+    void clearButtons(Array<Button *> &buttons);
     void changeState(GameState newState);
     bool isTankFromCurrentPlayer(Tank *tank);
     int countAliveTanks(int playerIndex);

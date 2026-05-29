@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <vector>
+#include "../../include/MyArray.h"
 #include <string>
 #include "Constants.h"
 #include "../../Logic/include/StructPosition.h"
@@ -27,15 +27,15 @@ public:
     void drawBullet(const Bullet &bullet);
 
     // Rutas
-    void drawPath(const std::vector<Position> &path,
+    void drawPath(const Array<Position> &path,
                   sf::Color color);            // para dibujan la ruta
     void drawBulletPath(const Bullet &bullet); // dibujar el camino de la bala
     void clearPaths();                         // borrar los caminos dibujados
 
     // Pantallas
-    void drawMainMenu(const std::vector<class Button *> &buttons);
-    void drawInstructions(const std::vector<class Button *> &buttons);
-    void drawGameOver(int winnerID, int player1Tanks, int player2Tanks, const std::vector<Button *> &buttons);
+    void drawMainMenu(const Array<class Button *> &buttons);
+    void drawInstructions(const Array<class Button *> &buttons);
+    void drawGameOver(int winnerID, int player1Tanks, int player2Tanks, const Array<class Button *> &buttons);
     void drawBackground();
 
     // Texturas
@@ -59,8 +59,8 @@ private:
     sf::Texture powerUpTexture;
 
     // rutas a dibujar
-    std::vector<sf::Vector2i> currentTankPath;
-    std::vector<sf::Vector2i> currentBulletPath;
+    Array<sf::Vector2i> currentTankPath;
+    Array<sf::Vector2i> currentBulletPath;
 
     // los helpers para dibujar
     void drawCellShape(sf::Vector2i cell, sf::Color color);

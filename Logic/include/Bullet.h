@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include "../../include/MyArray.h"
 #include <SFML/Graphics.hpp>
 #include "StructPosition.h"
 #include "EnumPowerUp.h"
@@ -20,7 +20,7 @@ public:
     void Step();
 
     // getters para Renderer
-    std::vector<Position> GetPath() const;
+    Array<Position> GetPath() const;
     sf::Vector2f GetCurrentPixelPosition() const;
     Position GetCurrentCell() const;
     float GetDamage() const;
@@ -52,7 +52,7 @@ private:
     int maxBounces;
 
     // trayectoria precalculada en celdas
-    std::vector<Position> path;
+    Array<Position> path;
 
     // power-up aplicado
     PowerUp attackAccuracy;

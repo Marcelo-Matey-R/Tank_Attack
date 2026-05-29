@@ -1,5 +1,6 @@
 #include "../include/Player.h"
 #include "../include/EnumPowerUp.h"
+
 #include <iostream>
 
 void Player::SetTurns()
@@ -9,7 +10,7 @@ void Player::SetTurns()
 
 void Player::GivePower(PowerUp up)
 {
-    powerUps.push(up);
+    powerUps.Enqueue(up);
 }
 
 int Player::GetId() const
@@ -29,19 +30,19 @@ int Player::GetTurns() const
 
 bool Player::HasPowerUp() const
 {
-    return !powerUps.empty();
+    return !powerUps.IsEmpty();
 }
 
 PowerUp Player::ConsumePowerUp()
 {
-    PowerUp powerToConsume = powerUps.front();
-    powerUps.pop();
+    PowerUp powerToConsume = powerUps.Peek();
+    powerUps.Dequeue();
     return powerToConsume;
 }
 
 void Player::ApplyPowerUp()
 {
-    if (powerUps.empty())
+    if (powerUps.IsEmpty())
         return;
     powerUpInUse = ConsumePowerUp();
     debugger(powerUpInUse);

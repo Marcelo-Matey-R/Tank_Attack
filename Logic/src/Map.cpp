@@ -149,7 +149,7 @@ bool Map::VerifyConectivity(const Position destinies[8]){
     return Pathfinding::IsConected(map, destinies);
 }
 
-void Map::EliminateObstacles(const std::vector<Position> &pos){
+void Map::EliminateObstacles(const Array<Position> &pos){
     for (Position p : pos){
         EliminateObstacle(p);
     }

@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <string>
-#include <vector>
+#include "../../include/MyArray.h"
 
 class HUD {
 public:
@@ -14,7 +14,7 @@ public:
     void updateTimer(int secondsRemaining);
     void updateCurrentPlayer(int playerID);
     void updateTankHealth(int playerID, int tankIndex, float healthPercent);
-    void updatePowerUpQueue(int playerID, const std::vector<std::string>& powerUps);
+    void updatePowerUpQueue(int playerID, const Array<std::string>& powerUps);
 
 private:
     sf::RenderWindow& window;
@@ -40,7 +40,7 @@ private:
     void drawTankHealth();
 
     // power-ups en cola
-    std::vector<std::string> powerUpQueue[2];
+    Array<std::string> powerUpQueue[2];
     sf::Text powerUpText[2];
     void drawPowerUpQueue();
 

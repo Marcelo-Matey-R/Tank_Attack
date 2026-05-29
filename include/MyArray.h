@@ -16,6 +16,8 @@ class Array{
     void CopyFrom(const Array &other);
 
     public:
+    using iterator = T*;
+    using const_iterator = const T*;
     Array();
     explicit Array(int capacity);
     ~Array();
@@ -24,12 +26,20 @@ class Array{
 
     void PushBack(const T& value);
     bool PopBack();
+    bool PopFront();
+    auto Front() const { return data[0]; }
+    auto Back() const { return data[lenght - 1]; }
     T& operator[](int index);
     const T& operator[](int index) const;
     bool IsEmpty() const;
     int Size() const;
     int Capacity() const;
     void Clear();
+    void Reverse();
+    iterator Insert(iterator index, const T& value);
+    iterator Insert(iterator pos, iterator beg, iterator last);
+    iterator begin() const { return data; }
+    iterator end() const { return data + lenght; }
 };
 
 #pragma endregion
@@ -104,7 +114,7 @@ template <typename T>
 void Array<T>::Resize(int newCapacity){
     T* tmp = new T[newCapacity];
 
-    for(int i = 0; i < size; i++){
+    for(int i = 0; i < lenght; i++){
         tmp[i] = data[i];
     }
 
@@ -118,6 +128,7 @@ void Array<T>::Clear(){
     delete[] data;
     data = nullptr;
     size = 0;
+    lenght = 0;
 };
 
 template <typename T>
@@ -156,6 +167,22 @@ bool Array<T>::PopBack(){
     return true;
 
 }
+template<typename T>
+bool Array<T>::PopFront(){
+    if(IsEmpty()) return false;
+
+    for(int i = 1; i < lenght; i++){
+        data[i-1] = data[i];
+    }
+
+    lenght--;
+
+    if(lenght > 0 && lenght <= size/4){
+        Resize(size/2);
+    }
+
+    return true;
+};
 
 template <typename T>
 bool Array<T>::IsEmpty()const{
@@ -172,6 +199,63 @@ int Array<T>::Capacity()const{
     return size;
 }
 
+template <typename T>
+void Array<T>::Reverse(){
+    for(int i = 0; i < lenght/2; i++){
+        std::swap(data[i], data[lenght - 1 - i]);
+    }
+}
+
+template <typename T>
+typename Array<T>::iterator Array<T>::Insert(typename Array<T>::iterator index, const T& value){
+    size_t idx = index - begin();
+    if(idx > (size_t)lenght){
+        throw std::out_of_range("Index out of the range");
+    }
+
+    if(lenght == size){
+        int newCapacity = (size == 0) ? 1 : 2*size;
+        Resize(newCapacity);
+        index = begin() + idx;
+    }
+
+    for(int i = lenght; i > (int)idx; i--){
+        data[i] = data[i-1];
+    }
+
+    data[idx] = value;
+    lenght++;
+
+    return begin() + idx;
+}
+
+template <typename T>
+typename Array<T>::iterator Array<T>::Insert(typename Array<T>::iterator pos, typename Array<T>::iterator beg, typename Array<T>::iterator last){
+    size_t idx = pos - begin();
+    size_t count = last - beg;
+
+    if(pos < begin() || pos > end()){
+        throw std::out_of_range("Index out of the range");
+    }
+
+    while(lenght + count > size){
+        int newCapacity = (size == 0) ? 1 : 2*size;
+        Resize(newCapacity);
+        pos = begin() + idx;
+    }
+
+    for(int i = lenght - 1; i >= (int)idx; i--){
+        data[i + count] = data[i];
+    }
+
+    for(size_t i = 0; i < count; i++){
+        data[idx + i] = beg[i];
+    }
+
+    lenght += count;
+
+    return begin() + idx;
+}
 #pragma endregion
 
 #endif

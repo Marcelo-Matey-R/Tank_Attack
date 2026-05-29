@@ -35,7 +35,7 @@ Game::Game()
     tankAnimStep = 0;
     tankAnimFrameCounter = 0;
     isTankMoving = false;
-    tankAnimPath.clear();
+    tankAnimPath.Clear();
     initMainMenu();
 }
 
@@ -141,16 +141,16 @@ void Game::initMainMenu()
     float buttonX = (WINDOW_WIDTH - MENU_BUTTON_WIDTH) / 2.f;
     float startY = 350.f;
     float spacingY = MENU_BUTTON_SPACING + MENU_BUTTON_HEIGHT;
-    menuButtons.push_back(new Button({buttonX, startY}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT}, "Jugar", this->font, MENU_BUTTON_FONT_SIZE));
-    menuButtons.push_back(new Button({buttonX, startY + spacingY}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT}, "Instrucciones", this->font, MENU_BUTTON_FONT_SIZE));
-    menuButtons.push_back(new Button({buttonX, startY + 2 * spacingY}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT}, "Salir", this->font, MENU_BUTTON_FONT_SIZE));
+    menuButtons.PushBack(new Button({buttonX, startY}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT}, "Jugar", this->font, MENU_BUTTON_FONT_SIZE));
+    menuButtons.PushBack(new Button({buttonX, startY + spacingY}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT}, "Instrucciones", this->font, MENU_BUTTON_FONT_SIZE));
+    menuButtons.PushBack(new Button({buttonX, startY + 2 * spacingY}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT}, "Salir", this->font, MENU_BUTTON_FONT_SIZE));
 }
 
 void Game::initInstructions()
 {
     clearButtons(instructionButtons);
     float buttonX = (WINDOW_WIDTH - MENU_BUTTON_WIDTH) / 2.f;
-    instructionButtons.push_back(new Button(
+    instructionButtons.PushBack(new Button(
         {buttonX, 700.f}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT},
         "Volver", font, MENU_BUTTON_FONT_SIZE));
 }
@@ -177,7 +177,7 @@ void Game::initPlaying()
     tankAnimStep = 0;
     tankAnimFrameCounter = 0;
     isTankMoving = false;
-    tankAnimPath.clear();
+    tankAnimPath.Clear();
 
     if (currentBullet)
     {
@@ -205,10 +205,10 @@ void Game::initGameOver()
 {
     clearButtons(gameOverButtons);
     float buttonX = (WINDOW_WIDTH - MENU_BUTTON_WIDTH) / 2.f;
-    gameOverButtons.push_back(new Button(
+    gameOverButtons.PushBack(new Button(
         {buttonX, 550.f}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT},
         "Volver al menu", font, MENU_BUTTON_FONT_SIZE));
-    gameOverButtons.push_back(new Button(
+    gameOverButtons.PushBack(new Button(
         {buttonX, 620.f}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT},
         "Salir", font, MENU_BUTTON_FONT_SIZE));
 }
@@ -284,7 +284,7 @@ void Game::handlePlayingEvents(PlayerAction &action)
                 if (tank != nullptr &&
                     isTankFromCurrentPlayer(tank))
                 {
-                    currentTankPath.clear();
+                    currentTankPath.Clear();
                     selectedTank = nullptr; 
                     handleTankSelection(cell);
                     return;
@@ -352,12 +352,10 @@ void Game::renderPlaying()
     renderer->drawMap(map);
     renderer->drawHoveredCell(inputHandler->getHoveredCell());
 
-   if (!currentTankPath.empty()) {
-    // mostrar solo el path restante
-    std::vector<Position> remainingPath(
-        currentTankPath.begin() + tankAnimStep,
-        currentTankPath.end()
-    );
+   if (!currentTankPath.IsEmpty()) {
+    Array<Position> remainingPath;
+    for (int i = tankAnimStep; i < currentTankPath.Size(); i++)
+        remainingPath.PushBack(currentTankPath[i]);
     renderer->drawPath(remainingPath, sf::Color(255, 255, 0, PATH_COLOR_ALPHA));
 }
 
@@ -473,7 +471,7 @@ void Game::updateBullet()
 
 void Game::updateTankAnimation() {
     if (!isTankMoving) return;
-    if (tankAnimPath.empty()) return;
+    if (tankAnimPath.IsEmpty()) return;
 
     tankAnimFrameCounter++;
     if (tankAnimFrameCounter < TANK_FRAMES_PER_STEP) return;
@@ -481,9 +479,9 @@ void Game::updateTankAnimation() {
 
     tankAnimStep++;
 
-    if (tankAnimStep >= (int)tankAnimPath.size()) {
+    if (tankAnimStep >= (int)tankAnimPath.Size()) {
         isTankMoving = false;
-        tankAnimPath.clear();
+        tankAnimPath.Clear();
         tankAnimStep = 0;
         endTurn();
         return;
@@ -571,9 +569,9 @@ void Game::endTurn()
 
             // actualizar HUD con nuevos power-ups
             // por ahora solo mostramos cuántos tiene
-            std::vector<std::string> powerUps;
+            Array<std::string> powerUps;
             if (players[currentPlayerIndex]->HasPowerUp())
-                powerUps.push_back("Power-up disponible");
+                powerUps.PushBack("Power-up disponible");
             hud->updatePowerUpQueue(currentPlayerIndex + 1, powerUps);
         }
     }
@@ -583,7 +581,7 @@ void Game::endTurn()
 
     // resetear estado del turno
     turnState = TurnState::SelectingTank;
-    currentTankPath.clear();
+    currentTankPath.Clear();
 }
 
 void Game::handleTankSelection(Position cell)
@@ -624,7 +622,7 @@ void Game::handleTankMovement(Position cell) {
     Element* mapGrid[GRID_ROWS][GRID_COLS];
     map->GetMap(mapGrid);
 
-    std::vector<Position> path;
+    Array<Position> path;
     try {
         path = selectedTank->GetPath(cell, mapGrid, movePrecise);
     } catch (...) {
@@ -632,7 +630,7 @@ void Game::handleTankMovement(Position cell) {
         return;
     }
 
-    if (path.empty()) {
+    if (path.IsEmpty()) {
         endTurn();
         return;
     }
@@ -694,7 +692,7 @@ void Game::handleTankAttack(Position cell)
         return;
     }
 
-    std::cout << "Path de bala size: " << currentBullet->GetPath().size() << std::endl;
+    std::cout << "Path de bala size: " << currentBullet->GetPath().Size() << std::endl;
     std::cout << "Bala activa: " << currentBullet->IsActive() << std::endl;
     turnState = TurnState::BulletMoving;
 }
@@ -709,20 +707,20 @@ void Game::handlePowerUp()
     players[currentPlayerIndex]->ApplyPowerUp();
 
     // actualizar HUD
-    std::vector<std::string> powerUps;
+    Array<std::string> powerUps;
     if (players[currentPlayerIndex]->HasPowerUp())
-        powerUps.push_back("Power-up disponible");
+        powerUps.PushBack("Power-up disponible");
     hud->updatePowerUpQueue(currentPlayerIndex + 1, powerUps);
 
     // el power-up consume el turno
     endTurn();
 }
 
-void Game::clearButtons(std::vector<Button *> &buttons)
+void Game::clearButtons(Array<Button *> &buttons)
 {
     for (auto i : buttons)
         delete i;
-    buttons.clear();
+    buttons.Clear();
 }
 void Game::changeState(GameState newState)
 {

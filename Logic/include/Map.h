@@ -4,8 +4,8 @@
 #include "EnumColorTank.h"
 #include "Tank.h"
 #include "Obstacle_and_Floor.h"
+#include "../../include/MyArray.h"
 #include <map>
-#include <vector>
 #include <stdexcept>
 #include <random>
 #ifndef MAP_H
@@ -47,7 +47,7 @@ class Map{
 	void InitMap();
 
 	// Elimina obstaculos del mapa en base a una lista de posiciones
-	void EliminateObstacles(const std::vector<Position> &pos);
+	void EliminateObstacles(const Array<Position> &pos);
 
 	// Si no hay conectividad entonces forzamos que haya
 	void CreateConectivity(); 
