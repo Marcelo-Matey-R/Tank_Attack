@@ -207,7 +207,7 @@ void Game::initGameOver()
     float buttonX = (WINDOW_WIDTH - MENU_BUTTON_WIDTH) / 2.f;
     gameOverButtons.push_back(new Button(
         {buttonX, 550.f}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT},
-        "Jugar de nuevo", font, MENU_BUTTON_FONT_SIZE));
+        "Volver al menu", font, MENU_BUTTON_FONT_SIZE));
     gameOverButtons.push_back(new Button(
         {buttonX, 620.f}, {MENU_BUTTON_WIDTH, MENU_BUTTON_HEIGHT},
         "Salir", font, MENU_BUTTON_FONT_SIZE));
