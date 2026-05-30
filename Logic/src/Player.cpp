@@ -70,13 +70,13 @@ void Player::UseTurn()
 void Player::debugger(PowerUp power)
 {
     if (power == PowerUp::NULL_POWERUP)
-        std::cout << "puto nulo" << '\n';
+        std::cout << "nulo" << '\n';
     else if (power == PowerUp::DOUBLETURN)
-        std::cout << "puto doble retrasado" << '\n';
+        std::cout << "doble" << '\n';
     else if (power == PowerUp::MOVEMENTPRECISION)
-        std::cout << "puto movimiento preciso" << '\n';
+        std::cout << "movimiento preciso" << '\n';
     else if (power == PowerUp::ATTACKPOWER)
-        std::cout << "puto poder" << '\n';
+        std::cout << "poder" << '\n';
     else if (power == PowerUp::ATTACKACCURACY)
-        std::cout << "puta precision" << '\n';
+        std::cout << "precision" << '\n';
 }

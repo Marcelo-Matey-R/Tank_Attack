@@ -285,7 +285,7 @@ void Game::handlePlayingEvents(PlayerAction &action)
                     isTankFromCurrentPlayer(tank))
                 {
                     currentTankPath.Clear();
-                    selectedTank = nullptr; 
+                    selectedTank = nullptr;
                     handleTankSelection(cell);
                     return;
                 }
@@ -352,13 +352,13 @@ void Game::renderPlaying()
     renderer->drawMap(map);
     renderer->drawHoveredCell(inputHandler->getHoveredCell());
 
-   if (!currentTankPath.IsEmpty()) {
-    Array<Position> remainingPath;
-    for (int i = tankAnimStep; i < currentTankPath.Size(); i++)
-        remainingPath.PushBack(currentTankPath[i]);
-    renderer->drawPath(remainingPath, sf::Color(255, 255, 0, PATH_COLOR_ALPHA));
-}
-
+    if (!currentTankPath.IsEmpty())
+    {
+        Array<Position> remainingPath;
+        for (int i = tankAnimStep; i < currentTankPath.Size(); i++)
+            remainingPath.PushBack(currentTankPath[i]);
+        renderer->drawPath(remainingPath, sf::Color(255, 255, 0, PATH_COLOR_ALPHA));
+    }
 
     if (selectedTank != nullptr)
         renderer->drawSelectedTank(*selectedTank);
@@ -469,17 +469,22 @@ void Game::updateBullet()
     }
 }
 
-void Game::updateTankAnimation() {
-    if (!isTankMoving) return;
-    if (tankAnimPath.IsEmpty()) return;
+void Game::updateTankAnimation()
+{
+    if (!isTankMoving)
+        return;
+    if (tankAnimPath.IsEmpty())
+        return;
 
     tankAnimFrameCounter++;
-    if (tankAnimFrameCounter < TANK_FRAMES_PER_STEP) return;
+    if (tankAnimFrameCounter < TANK_FRAMES_PER_STEP)
+        return;
     tankAnimFrameCounter = 0;
 
     tankAnimStep++;
 
-    if (tankAnimStep >= (int)tankAnimPath.Size()) {
+    if (tankAnimStep >= (int)tankAnimPath.Size())
+    {
         isTankMoving = false;
         tankAnimPath.Clear();
         tankAnimStep = 0;
@@ -571,7 +576,16 @@ void Game::endTurn()
             // por ahora solo mostramos cuántos tiene
             Array<std::string> powerUps;
             if (players[currentPlayerIndex]->HasPowerUp())
-                powerUps.PushBack("Power-up disponible");
+            {
+                if (players[currentPlayerIndex]->GetNextPowerUp() == PowerUp::DOUBLETURN)
+                    powerUps.PushBack("Doble turno");
+                else if (players[currentPlayerIndex]->GetNextPowerUp() == PowerUp::MOVEMENTPRECISION)
+                    powerUps.PushBack("Movimiento preciso");
+                else if (players[currentPlayerIndex]->GetNextPowerUp() == PowerUp::ATTACKACCURACY)
+                    powerUps.PushBack("Precision de ataque");
+                else if (players[currentPlayerIndex]->GetNextPowerUp() == PowerUp::ATTACKPOWER)
+                    powerUps.PushBack("Poder de ataque");
+            }
             hud->updatePowerUpQueue(currentPlayerIndex + 1, powerUps);
         }
     }
@@ -611,26 +625,34 @@ void Game::handleTankSelection(Position cell)
     turnState = TurnState::TankSelected;
 }
 
-void Game::handleTankMovement(Position cell) {
-    if (selectedTank == nullptr) return;
+void Game::handleTankMovement(Position cell)
+{
+    if (selectedTank == nullptr)
+        return;
 
-    Element* elem = map->GetElementAt(cell);
-    if (elem == nullptr) return;
-    if (elem->GetType() != TypeElement::Floor) return;
+    Element *elem = map->GetElementAt(cell);
+    if (elem == nullptr)
+        return;
+    if (elem->GetType() != TypeElement::Floor)
+        return;
 
     PowerUp movePrecise = getMovementPowerUp();
-    Element* mapGrid[GRID_ROWS][GRID_COLS];
+    Element *mapGrid[GRID_ROWS][GRID_COLS];
     map->GetMap(mapGrid);
 
     Array<Position> path;
-    try {
+    try
+    {
         path = selectedTank->GetPath(cell, mapGrid, movePrecise);
-    } catch (...) {
+    }
+    catch (...)
+    {
         endTurn();
         return;
     }
 
-    if (path.IsEmpty()) {
+    if (path.IsEmpty())
+    {
         endTurn();
         return;
     }
@@ -641,7 +663,7 @@ void Game::handleTankMovement(Position cell) {
     tankAnimStep = 0;
     tankAnimFrameCounter = 0;
     isTankMoving = true;
-    
+
     // cambiar estado para bloquear inputs mientras se mueve
     turnState = TurnState::BulletMoving;
 }
@@ -709,7 +731,16 @@ void Game::handlePowerUp()
     // actualizar HUD
     Array<std::string> powerUps;
     if (players[currentPlayerIndex]->HasPowerUp())
-        powerUps.PushBack("Power-up disponible");
+    {
+        if (players[currentPlayerIndex]->GetNextPowerUp() == PowerUp::DOUBLETURN)
+            powerUps.PushBack("Doble turno");
+        else if (players[currentPlayerIndex]->GetNextPowerUp() == PowerUp::MOVEMENTPRECISION)
+            powerUps.PushBack("Movimiento preciso");
+        else if (players[currentPlayerIndex]->GetNextPowerUp() == PowerUp::ATTACKACCURACY)
+            powerUps.PushBack("Precision de ataque");
+        else if (players[currentPlayerIndex]->GetNextPowerUp() == PowerUp::ATTACKPOWER)
+            powerUps.PushBack("Poder de ataque");
+    }
     hud->updatePowerUpQueue(currentPlayerIndex + 1, powerUps);
 
     // el power-up consume el turno

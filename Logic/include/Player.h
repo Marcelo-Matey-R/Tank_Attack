@@ -35,7 +35,7 @@ public:
 
     // verificar si el turno del jugador terminó
     bool IsTurnOver() const;
-
+    PowerUp GetNextPowerUp() const { return powerUps.IsEmpty() ? PowerUp::NULL_POWERUP : powerUps.Peek(); }
     // resetear turno
     void ResetTurn();
     void UseTurn();
